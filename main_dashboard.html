@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Tools Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .tool-card:nth-child(2) { animation-delay: 0.1s; }
+        .tool-card:nth-child(3) { animation-delay: 0.2s; }
+        .tool-card:nth-child(4) { animation-delay: 0.3s; }
+        .tool-card:nth-child(5) { animation-delay: 0.4s; }
+        .tool-card:nth-child(6) { animation-delay: 0.5s; }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .tool-card:hover::before {
+            left: 100%;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .tool-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .budget .tool-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .employee .tool-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .farm .tool-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .operations .tool-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .admin .tool-icon { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+        .manufacturing .tool-icon { background: linear-gradient(135deg, #00ddeb, #00b7eb); }
+
+        .tool-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .tool-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .launch-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .launch-btn:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            transform: scale(1.05);
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat-item h4 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .stat-item p {
+            opacity: 0.9;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .notification {
+            transition: opacity 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tool-card {
+                padding: 20px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-available {
+            background: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        .status-unavailable {
+            background: #f44336;
+            box-shadow: 0 0 5px rgba(244, 67, 54, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Analysis Tools Dashboard</h1>
+            <p>Comprehensive business intelligence and analytics platform</p>
+        </div>
+
+        <div class="tools-grid">
+            <div class="tool-card budget" data-tool="budget_analyzer_arabic">
+                <div class="tool-icon">💰</div>
+                <h3>Budget Analyzer Arabic</h3>
+                <p>Advanced financial analysis and budget management tool with Arabic language support for comprehensive financial planning.</p>
+                <button class="launch-btn">Launch Tool</button>
+            </div>
+
+            <div class="tool-card employee" data-tool="employee_analysis">
+                <div class="tool-icon">👥</div>
+                <h3>Employee Analysis</h3>
+                <p>Human resources analytics platform for employee performance tracking, workforce insights, and organizational analysis.</p>
+                <button class="launch-btn">Launch Tool</button>
+            </div>
+
+            <div class="tool-card farm" data-tool="farm_analysis_distribution">
+                <div class="tool-icon">🌾</div>
+                <h3>Farm Analysis & Distribution</h3>
+                <p>Agricultural analytics system for crop analysis, distribution planning, and farm management optimization.</p>
+                <button class="launch-btn">Launch Tool</button>
+            </div>
+
+            <div class="tool-card operations" data-tool="operations_report">
+                <div class="tool-icon">📊</div>
+                <h3>Operations Report</h3>
+                <p>Comprehensive operational analytics and reporting dashboard for business process monitoring and optimization.</p>
+                <button class="launch-btn">Launch Tool</button>
+            </div>
+
+            <div class="tool-card admin" data-tool="pdf_viewer">
+                <div class="tool-icon">📋</div>
+                <h3>Administrative Structure</h3>
+                <p>Administrative structure analytics and reporting dashboard for business process monitoring and optimization.</p>
+                <button class="launch-btn">Launch Tool</button>
+            </div>
+
+            <div class="tool-card manufacturing" data-tool="manufacturing_analytics">
+                <div class="tool-icon">🆕</div>
+                <h3>New Project Analytics</h3>
+                <p>Advanced New Project data analysis with interactive visualizations and real-time insights.</p>
+                <button class="launch-btn">Launch Tool</button>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2>Platform Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>6</h4>
+                    <p>Analysis Tools</p>
+                </div>
+                <div class="stat-item">
+                    <h4>100%</h4>
+                    <p>Data Accuracy</p>
+                </div>
+                <div class="stat-item">
+                    <h4>24/7</h4>
+                    <p>Availability</p>
+                </div>
+                <div class="stat-item">
+                    <h4>∞</h4>
+                    <p>Possibilities</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Analysis Tools Dashboard. Empowering data-driven decisions.</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration object for all tools
+        const toolConfig = {
+            'budget_analyzer_arabic': {
+                file: 'budget_analyzer_arabic.html',
+                name: 'Budget Analyzer Arabic'
+            },
+            'employee_analysis': {
+                file: 'Employee_analysis.html',
+                name: 'Employee Analysis'
+            },
+            'farm_analysis_distribution': {
+                file: 'farm_analysis_Distribution.html',
+                name: 'Farm Analysis & Distribution'
+            },
+            'operations_report': {
+                file: 'Operations_Report.html',
+                name: 'Operations Report'
+            },
+            'pdf_viewer': {
+                file: 'pdf_viewer.html',
+                name: 'Administrative Structure'
+            },
+            'manufacturing_analytics': {
+                file: 'manufacturing-dashboard.html',
+                name: 'Manufacturing Analytics'
+            }
+        };
+
+        function openTool(toolName) {
+            const tool = toolConfig[toolName];
+            
+            if (!tool) {
+                showNotification(`Tool "${toolName}" not found in configuration.`, 'error');
+                return;
+            }
+            
+            // Try to open the file
+            try {
+                window.open(tool.file, '_blank');
+                showNotification(`Opening ${tool.name}...`, 'info');
+            } catch (error) {
+                showNotification(`Could not open ${tool.name}. Please ensure the file exists.`, 'error');
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            const style = type === 'error' ? 
+                'background: #f44336; color: white;' : 
+                'background: #4CAF50; color: white;';
+                
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 10px;
+                z-index: 1000;
+                ${style}
+                font-family: inherit;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease-out;
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 5 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Enhanced tool availability checking
+        function checkAvailableTools() {
+            Object.keys(toolConfig).forEach(toolName => {
+                const tool = toolConfig[toolName];
+                checkSingleTool(toolName, tool.file);
+            });
+        }
+        
+        function checkSingleTool(toolName, fileName) {
+            // For local files, we'll assume they exist and mark as available
+            // In a real environment, you could use fetch with HEAD method
+            markToolAsAvailable(toolName, fileName);
+        }
+        
+        function markToolAsAvailable(toolName, fileName) {
+            const card = document.querySelector(`[data-tool="${toolName}"]`);
+            if (card) {
+                const btn = card.querySelector('.launch-btn');
+                btn.textContent = 'Launch Tool';
+                btn.style.opacity = '1';
+                card.style.opacity = '1';
+                
+                // Add status indicator
+                addStatusIndicator(card, 'available');
+            }
+        }
+        
+        function markToolAsUnavailable(toolName) {
+            const card = document.querySelector(`[data-tool="${toolName}"]`);
+            if (card) {
+                const btn = card.querySelector('.launch-btn');
+                btn.textContent = 'File Not Found';
+                btn.style.opacity = '0.5';
+                card.style.opacity = '0.7';
+                
+                // Add status indicator
+                addStatusIndicator(card, 'unavailable');
+            }
+        }
+
+        function addStatusIndicator(card, status) {
+            // Remove existing indicator
+            const existingIndicator = card.querySelector('.status-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+
+            // Add new indicator
+            const indicator = document.createElement('div');
+            indicator.className = `status-indicator status-${status}`;
+            card.appendChild(indicator);
+        }
+
+        // Event delegation for tool cards
+        function setupEventListeners() {
+            const toolsGrid = document.querySelector('.tools-grid');
+            
+            toolsGrid.addEventListener('click', function(e) {
+                const card = e.target.closest('.tool-card');
+                if (card) {
+                    const toolName = card.getAttribute('data-tool');
+                    if (toolName) {
+                        openTool(toolName);
+                    }
+                }
+            });
+
+            // Enhanced hover effects
+            toolsGrid.addEventListener('mouseenter', function(e) {
+                const card = e.target.closest('.tool-card');
+                if (card) {
+                    card.style.transform = 'translateY(-10px) scale(1.02)';
+                }
+            }, true);
+            
+            toolsGrid.addEventListener('mouseleave', function(e) {
+                const card = e.target.closest('.tool-card');
+                if (card) {
+                    card.style.transform = 'translateY(0) scale(1)';
+                }
+            }, true);
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Check which tools are available
+            checkAvailableTools();
+
+            // Add floating animation to icons
+            const icons = document.querySelectorAll('.tool-icon');
+            icons.forEach((icon, index) => {
+                icon.style.animation = `float 3s ease-in-out infinite ${index * 0.5}s`;
+            });
+
+            // Welcome message
+            setTimeout(() => {
+                showNotification('Dashboard loaded successfully! Click any tool to get started.', 'info');
+            }, 1000);
+        });
+
+        // Handle errors gracefully
+        window.addEventListener('error', function(e) {
+            console.error('Dashboard error:', e.error);
+            showNotification('An error occurred. Please refresh the page.', 'error');
+        });
+    </script>
+</body>
+</html>
